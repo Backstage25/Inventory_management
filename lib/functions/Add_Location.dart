@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 class AddLoc extends StatefulWidget {
   const AddLoc({super.key});
   @override
@@ -96,11 +94,12 @@ class _AddLocState extends State<AddLoc> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 40),
             const Text(
               'LOCATION NAME',
-              style: TextStyle(color: Colors.white70, fontSize: 20, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white, fontSize: 28, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
             TextField(
               controller: _controller,
               style: const TextStyle(color: Colors.white, fontFamily : 'Inter'),

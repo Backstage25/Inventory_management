@@ -1,23 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.dark().copyWith(
-          scaffoldBackgroundColor: const Color(0xFF1E1E1E)
-      ),
-      home: const ShowInventory(),
-    );
-  }
-}
-
 class ShowInventory extends StatefulWidget {
   const ShowInventory({super.key});
 
@@ -85,6 +67,7 @@ class _ShowInventoryState extends State<ShowInventory> {
     }).toList();
 
     return Scaffold(
+      backgroundColor: const Color(0xFF1E1E1E),
       appBar: AppBar(
         title: const Text("Show Inventory"),
       ),
@@ -129,14 +112,28 @@ class _ShowInventoryState extends State<ShowInventory> {
                 children: filteredData.map((entry) {
                   return Card(
                     color: Color(0xFF2E2E2E),
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 12),
+                    margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                     child: ExpansionTile(
-                      title: Text(entry.key),
+                      title: Text(
+                        entry.key,
+                        style: TextStyle(
+                          fontSize: 22,
+                        ),
+                      ),
                       children: entry.value.entries.map((itemEntry) {
                         return ListTile(
-                          title: Text(itemEntry.key),
-                          trailing: Text(itemEntry.value.toString()),
+                          title: Text(
+                            itemEntry.key,
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
+                          trailing: Text(
+                            itemEntry.value.toString(),
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
+                          ),
                         );
                       }).toList(),
                     ),
@@ -146,65 +143,6 @@ class _ShowInventoryState extends State<ShowInventory> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class InventorySection extends StatefulWidget {
-  final String title;
-  final Map<String, int> items;
-
-  const InventorySection({
-    super.key,
-    required this.title,
-    required this.items,
-  });
-
-  @override
-  State<InventorySection> createState() => _InventorySectionState();
-}
-
-class _InventorySectionState extends State<InventorySection> {
-  bool isExpanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ExpansionTile(
-        title: Text(
-          widget.title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        trailing: Icon(
-          isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-          color: Colors.white,
-        ),
-        onExpansionChanged: (val) {
-          setState(() {
-            isExpanded = val;
-          });
-        },
-        children: widget.items.entries.map((entry) {
-          return ListTile(
-            title: Text(
-              entry.key,
-              style: const TextStyle(color: Colors.white),
-            ),
-            trailing: Text(
-              entry.value.toString(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          );
-        }).toList(),
       ),
     );
   }
