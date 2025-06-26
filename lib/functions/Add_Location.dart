@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
+import '../screens/Dashboard.dart';
 
 
 
@@ -92,9 +93,10 @@ class _AddLocState extends State<AddLoc> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 30),
             const Text(
               'LOCATION NAME',
-              style: TextStyle(color: Colors.white70, fontSize: 20, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white, fontSize: 28, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 15),
             TextField(
@@ -102,7 +104,7 @@ class _AddLocState extends State<AddLoc> {
               style: const TextStyle(color: Colors.white, fontFamily : 'Inter'),
               decoration: InputDecoration(
                 hintText: 'Enter location name',
-                hintStyle: const TextStyle(color: Colors.white38, fontFamily: 'Inter', fontSize : 18),
+                hintStyle: const TextStyle(color: Colors.white, fontFamily: 'Inter', fontSize : 18),
                 filled: true,
                 fillColor: Color(0xFF2E2E2E),
                 contentPadding: const EdgeInsets.symmetric(

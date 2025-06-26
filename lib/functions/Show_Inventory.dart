@@ -1,23 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management_system/screens/Dashboard.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.dark().copyWith(
-          scaffoldBackgroundColor: const Color(0xFF1E1E1E)
-      ),
-      home: const ShowInventory(),
-    );
-  }
-}
 
 class ShowInventory extends StatefulWidget {
   const ShowInventory({super.key});
@@ -75,6 +58,7 @@ class _ShowInventoryState extends State<ShowInventory> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     final filteredData = inventoryData.entries.where((entry) {
       final locationName = entry.key.toLowerCase();
       final matchesLocation = locationName.contains(searchQuery.toLowerCase());
@@ -86,6 +70,7 @@ class _ShowInventoryState extends State<ShowInventory> {
     }).toList();
 
     return Scaffold(
+      backgroundColor: Color(0xFF1E1E1E),
       appBar: SimpleAppBar(
         title: 'SHOW INVENTORY',
         onBack: () {
@@ -97,11 +82,11 @@ class _ShowInventoryState extends State<ShowInventory> {
         onProfile: () {},
       ),
       body: Padding(
-        padding: const EdgeInsets.only(top: 20), // Space below AppBar
+        padding: EdgeInsets.only(top: screenWidth * 0.1), // Space below AppBar
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
@@ -131,20 +116,35 @@ class _ShowInventoryState extends State<ShowInventory> {
                 },
               ),
             ),
-            const SizedBox(height: 20), // Spacing between search bar and list
+            SizedBox(height: screenWidth * 0.1), // Spacing between search bar and list
             Expanded(
               child: ListView(
                 children: filteredData.map((entry) {
                   return Card(
                     color: Color(0xFF2E2E2E),
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 12),
+                    margin: EdgeInsets.symmetric(
+                        vertical: screenWidth * 0.025, horizontal: screenWidth * 0.05),
                     child: ExpansionTile(
-                      title: Text(entry.key),
+                      title: Text(
+                        entry.key,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.0625
+                        ),
+                      ),
                       children: entry.value.entries.map((itemEntry) {
                         return ListTile(
-                          title: Text(itemEntry.key),
-                          trailing: Text(itemEntry.value.toString()),
+                          title: Text(
+                            itemEntry.key,
+                            style: TextStyle(
+                                fontSize: screenWidth * 0.05
+                            ),
+                          ),
+                          trailing: Text(
+                            itemEntry.value.toString(),
+                            style: TextStyle(
+                                fontSize: screenWidth * 0.05
+                            ),
+                          ),
                         );
                       }).toList(),
                     ),
@@ -154,65 +154,6 @@ class _ShowInventoryState extends State<ShowInventory> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class InventorySection extends StatefulWidget {
-  final String title;
-  final Map<String, int> items;
-
-  const InventorySection({
-    super.key,
-    required this.title,
-    required this.items,
-  });
-
-  @override
-  State<InventorySection> createState() => _InventorySectionState();
-}
-
-class _InventorySectionState extends State<InventorySection> {
-  bool isExpanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ExpansionTile(
-        title: Text(
-          widget.title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        trailing: Icon(
-          isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-          color: Colors.white,
-        ),
-        onExpansionChanged: (val) {
-          setState(() {
-            isExpanded = val;
-          });
-        },
-        children: widget.items.entries.map((entry) {
-          return ListTile(
-            title: Text(
-              entry.key,
-              style: const TextStyle(color: Colors.white),
-            ),
-            trailing: Text(
-              entry.value.toString(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          );
-        }).toList(),
       ),
     );
   }

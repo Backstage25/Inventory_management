@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/Dashboard.dart';
 import 'Confirm_Items.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 
@@ -51,13 +52,6 @@ class _AddItemsPageState extends State<AddItemsPage> {
           );
         },
         onProfile: () {},
-      ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.account_circle_outlined, color: Colors.white),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(

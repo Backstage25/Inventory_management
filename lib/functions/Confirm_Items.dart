@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management_system/screens/Dashboard.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 
 class ConfirmItemsPage extends StatelessWidget {
@@ -35,13 +36,6 @@ class ConfirmItemsPage extends StatelessWidget {
           );
         },
         onProfile: () {},
-      ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.account_circle_outlined, color: Colors.white),
-          ),
-        ],
       ),
       body: Padding(
         padding: EdgeInsets.only(

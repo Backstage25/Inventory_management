@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management_system/screens/Dashboard.dart';
 import 'package:inventory_management_system/screens/Dashboard_Admin.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 
@@ -48,14 +49,6 @@ class _PasswordScreenState extends State<PasswordScreen> {
         },
         onProfile: () {},
       ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Icon(Icons.account_circle_outlined, color: Colors.white),
-          ),
-        ],
-      ),
-
       // Main content
       body: Column(
         children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management_system/screens/Dashboard.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 
 class RemoveLoc extends StatelessWidget {

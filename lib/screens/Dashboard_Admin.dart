@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management_system/screens/Dashboard.dart';
 import 'package:inventory_management_system/widgets/Dashboard_Button.dart';
 import 'package:inventory_management_system/functions/Add_Items.dart';
 import 'package:inventory_management_system/functions/Remove_Inventory.dart';
@@ -29,13 +30,6 @@ class DashboardAdmin extends StatelessWidget {
           );
         },
         onProfile: () {},
-      ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.account_circle_outlined),
-          )
-        ],
       ),
       body: Center(
           child: SingleChildScrollView(
