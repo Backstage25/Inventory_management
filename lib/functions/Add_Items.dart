@@ -104,7 +104,6 @@ class _AddItemsPageState extends State<AddItemsPage> {
               _buildLabel('QUANTITY'),
               SizedBox(height: scaleH(6)),
               _buildQuantityInput(),
-
               SizedBox(height: scaleH(60)),
 
               Align(

@@ -57,31 +57,24 @@ class _PasswordScreenState extends State<PasswordScreen> {
           // Password TextField
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
-            child: SizedBox(
-              height: 53,
-              child: TextField(
-                controller: _passwordController,
-                obscureText: true,
-                keyboardType: TextInputType.number,
-                maxLength: 6,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Inter',
-                ),
-                decoration: InputDecoration(
-                  counterText: "",
-                  filled: true,
-                  fillColor: const Color(0xFF2E2E2E),
-                  hintText: 'Enter Password',
-                  hintStyle: const TextStyle(
-                    color: Colors.grey,
-                    fontFamily: 'Roboto',
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                    borderSide: BorderSide.none,
-                  ),
+            child: TextField(
+              controller: _passwordController,
+              obscureText: true,
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontFamily : 'Inter'),
+              decoration: InputDecoration(
+                counterText: "",
+                hintText: 'Enter Password',
+                hintStyle: TextStyle(color: Colors.grey, fontFamily: 'Roboto', fontSize : screenWidth * 0.05),
+                filled: true,
+                fillColor: Color(0xFF2E2E2E),
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
@@ -106,11 +99,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
                     ),
                     onPressed: () => Navigator.pop(context),
                     child: Text(
-                      'Cancel',
+                      'CANCEL',
                       style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Inter',
-                        fontSize: 20 * fontScale,
+                          color: Colors.white,
+                          fontFamily: 'Inter',
+                          fontSize: 20 * fontScale,
+                          fontWeight: FontWeight.bold
                       ),
                     ),
                   ),
@@ -132,10 +126,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
                     ),
                     onPressed: _validatePassword,
                     child: Text(
-                      'Confirm',
+                      'CONFIRM',
                       style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 20 * fontScale,
+                          fontFamily: 'Inter',
+                          fontSize: 20 * fontScale,
+                          fontWeight: FontWeight.bold
                       ),
                     ),
                   ),

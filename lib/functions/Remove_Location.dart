@@ -54,70 +54,39 @@ class _RemoveLocState extends State<RemoveLoc> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: height * 0.08),
+            SizedBox(height: height * 0.1),
             Text(
-              "CHOOSE LOCATION",
+              'CHOOSE LOCATION',
               style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: width * 0.05,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
+                  color: Colors.white,
+                  fontSize: width * 0.075 ,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: height * 0.015),
+            SizedBox(height: width * 0.05),
             _locations.isEmpty
                 ? Center(child: CircularProgressIndicator(color: Colors.white))
-                : Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[800],
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: DropdownButton<String>(
-                value: _selectedLocationId,
-                isExpanded: true,
-                dropdownColor: Colors.grey[850],
-                hint: Text(
-                  "Select",
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: width * 0.05,
-                    color: Colors.white70,
-                  ),
-                ),
-                iconEnabledColor: Colors.white,
-                underline: const SizedBox(),
-                items: _locations.map((loc) {
-                  return DropdownMenuItem<String>(
-                    value: loc['id'],
-                    child: Text(
-                      loc['name'] ?? '',
-                      style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: width * 0.045,
-                        color: Colors.white,
-                      ),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (val) {
-                  setState(() {
-                    _selectedLocationId = val;
-                  });
-                },
-              ),
+                : CustomDropdown(
+              value: _selectedLocationId,
+              items: _locations,
+              width: width,
+              onChanged: (val) {
+                setState(() {
+                  _selectedLocationId = val;
+                });
+              },
             ),
             const Spacer(),
             Center(
               child: SizedBox(
-                width: width * 0.4,
-                height: height * 0.06,
+                width: width * 0.35,
+                height: width * 0.125,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                   onPressed: _selectedLocationId == null
@@ -179,7 +148,7 @@ class _RemoveLocState extends State<RemoveLoc> {
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.bold,
-                      fontSize: width * 0.06,
+                      fontSize: width * 0.05,
                     ),
                   ),
                 ),
@@ -190,5 +159,142 @@ class _RemoveLocState extends State<RemoveLoc> {
         ),
       ),
     );
+  }
+}
+
+class CustomDropdown extends StatefulWidget {
+  final String? value;
+  final List<Map<String, String>> items;
+  final Function(String?) onChanged;
+  final double width;
+
+  const CustomDropdown({
+    Key? key,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+    required this.width,
+  }) : super(key: key);
+
+  @override
+  _CustomDropdownState createState() => _CustomDropdownState();
+}
+
+class _CustomDropdownState extends State<CustomDropdown> {
+  bool _isOpen = false;
+  late OverlayEntry _overlayEntry;
+  final LayerLink _layerLink = LayerLink();
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: GestureDetector(
+        onTap: _toggleDropdown,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.grey[800],
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.value != null
+                    ? widget.items.firstWhere((item) => item['id'] == widget.value)['name'] ?? 'Select'
+                    : 'Select',
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                  fontSize: widget.width * 0.045,
+                  color: widget.value != null ? Colors.white : Colors.white70,
+                ),
+              ),
+              Icon(
+                _isOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                color: Colors.white,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _toggleDropdown() {
+    if (_isOpen) {
+      _closeDropdown();
+    } else {
+      _openDropdown();
+    }
+  }
+
+  void _openDropdown() {
+    _overlayEntry = _createOverlayEntry();
+    Overlay.of(context).insert(_overlayEntry);
+    setState(() {
+      _isOpen = true;
+    });
+  }
+
+  void _closeDropdown() {
+    _overlayEntry.remove();
+    setState(() {
+      _isOpen = false;
+    });
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    Size size = renderBox.size;
+
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        width: size.width,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          showWhenUnlinked: false,
+          offset: Offset(0.0, size.height),
+          child: Material(
+            elevation: 4,
+            color: Colors.grey[850],
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 200),
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: widget.items.length,
+                itemBuilder: (context, index) {
+                  final item = widget.items[index];
+                  return ListTile(
+                    title: Text(
+                      item['name'] ?? '',
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                        fontSize: widget.width * 0.045,
+                        color: Colors.white,
+                      ),
+                    ),
+                    onTap: () {
+                      widget.onChanged(item['id']);
+                      _closeDropdown();
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    if (_isOpen) {
+      _overlayEntry.remove();
+    }
+    super.dispose();
   }
 }

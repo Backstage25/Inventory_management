@@ -70,8 +70,6 @@ class HistoryMake extends StatelessWidget {
         .map((doc) => HistoryItem.fromFirestore(doc.data()))
         .toList());
   }
-
-  @override
   Widget _buildExpandableTile(HistoryItem item, Size screenSize) {
     return Container(
       decoration: BoxDecoration(
