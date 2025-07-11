@@ -95,6 +95,9 @@ class _AddLocState extends State<AddLoc> {
 
   @override
   Widget build(BuildContext context) {
+
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Color(0xFF1E1E1E),
       appBar: SimpleAppBar(
@@ -112,34 +115,37 @@ class _AddLocState extends State<AddLoc> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 30),
-            const Text(
+            SizedBox(height: screenWidth * 0.1),
+            Text(
               'LOCATION NAME',
-              style: TextStyle(color: Colors.white, fontSize: 28, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: screenWidth * 0.075 ,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: screenWidth * 0.05),
             TextField(
               controller: _controller,
               style: const TextStyle(color: Colors.white, fontFamily : 'Inter'),
               decoration: InputDecoration(
                 hintText: 'Enter location name',
-                hintStyle: const TextStyle(color: Colors.white, fontFamily: 'Inter', fontSize : 18),
+                hintStyle: TextStyle(color: Colors.grey, fontFamily: 'Inter', fontSize : screenWidth * 0.05),
                 filled: true,
                 fillColor: Color(0xFF2E2E2E),
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 14),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
               ),
             ),
-            const Spacer(),
+            Spacer(),
             if (!_added)
-
               Center (child :SizedBox(
-                width: 150,
-                height: 48,
+                width: screenWidth * 0.35,
+                height: screenWidth * 0.125,
                 child: ElevatedButton(
                   onPressed: _showConfirmSheet,
                   style: ElevatedButton.styleFrom(
@@ -150,9 +156,12 @@ class _AddLocState extends State<AddLoc> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
+                  child: Text(
                     'ADD',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      fontSize: screenWidth*0.05
+                    ),
                   ),
                 ),
               ))
@@ -160,12 +169,12 @@ class _AddLocState extends State<AddLoc> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  margin: const EdgeInsets.only(bottom: 80),
+                  margin: EdgeInsets.only(bottom: screenWidth * 0.1),
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: Colors.white24,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(50),
                   ),
                   child: const Text(
                     'ADDED SUCCESSFULLY!',

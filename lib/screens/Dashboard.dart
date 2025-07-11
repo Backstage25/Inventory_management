@@ -8,6 +8,7 @@ import 'package:inventory_management_system/functions/Transfer_Inventory.dart';
 import 'package:inventory_management_system/functions/Add_Location.dart';
 import 'package:inventory_management_system/screens/Password_Screen.dart';
 import 'package:inventory_management_system/screens/Startup.dart';
+import 'package:inventory_management_system/widgets/history_make.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -229,7 +230,12 @@ class _DashboardState extends State<Dashboard> {
                 DashboardButton(
                   iconPath: 'assets/icons/history.svg',
                   label: "HISTORY",
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HistoryMake()),
+                    );
+                  },
                 ),
                 DashboardButton(
                   iconPath: 'assets/icons/admin_options.svg',
