@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management_system/functions/Confirm_RemoveLoc.dart';
 import 'package:inventory_management_system/screens/Dashboard_Admin.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +11,7 @@ class RemoveLoc extends StatefulWidget {
 class _RemoveLocState extends State<RemoveLoc> {
   String? _selectedLocationId;
   List<Map<String, String>> _locations = [];
+  bool _isRemoving = false;
 
   @override
   void initState() {
@@ -32,6 +32,97 @@ class _RemoveLocState extends State<RemoveLoc> {
     });
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF2E2E2E),
+        title: const Text('Error', style: TextStyle(color: Colors.red)),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(color: Colors.white)),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF2E2E2E),
+        title: const Text('Success', style: TextStyle(color: Colors.green)),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(color: Colors.white)),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<bool> _showConfirmationDialog(String locationName) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF2E2E2E),
+        title: const Text('Confirm Removal', style: TextStyle(color: Colors.white)),
+        content: Text(
+          'Are you sure you want to remove "$locationName"?',
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    ) ??
+        false;
+  }
+
+  Future<bool> _locationHasItems(String locationId) async {
+    final query = await FirebaseFirestore.instance
+        .collection('locations')
+        .doc(locationId)
+        .collection('inventory')
+        .where('Quantity', isGreaterThan: 0)
+        .limit(1)
+        .get();
+    return query.docs.isNotEmpty;
+
+  }
+
+  Future<void> _removeLocation(String locationId, String locationName) async {
+    setState(() {
+      _isRemoving = true;
+    });
+    try {
+      await FirebaseFirestore.instance.collection('locations').doc(locationId).delete();
+      setState(() {
+        _selectedLocationId = null;
+      });
+      await fetchLocations();
+      _showSuccessDialog('Successfully removed "$locationName"!');
+    } catch (e) {
+      _showErrorDialog("Error removing location: ${e.toString()}");
+    } finally {
+      setState(() {
+        _isRemoving = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -48,7 +139,7 @@ class _RemoveLocState extends State<RemoveLoc> {
         },
         onProfile: () {},
       ),
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Color(0xFF1E1E1E),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.06),
         child: Column(
@@ -59,7 +150,7 @@ class _RemoveLocState extends State<RemoveLoc> {
               'CHOOSE LOCATION',
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: width * 0.075 ,
+                  fontSize: width * 0.075,
                   fontFamily: 'Roboto',
                   fontWeight: FontWeight.bold),
             ),
@@ -89,61 +180,31 @@ class _RemoveLocState extends State<RemoveLoc> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  onPressed: _selectedLocationId == null
+                  onPressed: _isRemoving
                       ? null
                       : () async {
+                    if (_selectedLocationId == null) {
+                      _showErrorDialog("Please select a location to remove.");
+                      return;
+                    }
                     final selectedLoc = _locations.firstWhere(
                             (loc) => loc['id'] == _selectedLocationId);
-
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ConfirmRemoveScreen(
-                          locationId: selectedLoc['id']!,
-                          locationName: selectedLoc['name']!,
-                        ),
-                      ),
-                    );
-
-                    if (result == true) {
-                      setState(() {
-                        _selectedLocationId = null;
-                      });
-
-                      await fetchLocations();
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Center(
-                            child: Text(
-                              'REMOVED SUCCESSFULLY!',
-                              style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                          ),
-                          backgroundColor: Colors.black,
-                          behavior: SnackBarBehavior.floating,
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                          margin: EdgeInsets.only(
-                            bottom:
-                            MediaQuery.of(context).size.height * 0.08,
-                            left: MediaQuery.of(context).size.width * 0.2,
-                            right:
-                            MediaQuery.of(context).size.width * 0.2,
-                          ),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
+                    final hasItems = await _locationHasItems(selectedLoc['id']!);
+                    if (hasItems) {
+                      _showErrorDialog(
+                          'Cannot remove "${selectedLoc['name']}". This location still has inventory items.');
+                      return;
+                    }
+                    final confirmed = await _showConfirmationDialog(selectedLoc['name']!);
+                    if (confirmed) {
+                      await _removeLocation(selectedLoc['id']!, selectedLoc['name']!);
                     }
                   },
-                  child: Text(
+                  child: _isRemoving
+                      ? CircularProgressIndicator(
+                    color: Colors.black,
+                  )
+                      : Text(
                     "REMOVE",
                     style: TextStyle(
                       fontFamily: 'Inter',
@@ -154,7 +215,7 @@ class _RemoveLocState extends State<RemoveLoc> {
                 ),
               ),
             ),
-            SizedBox(height: height * 0.04),
+            SizedBox(height: height * 0.08),
           ],
         ),
       ),
@@ -260,7 +321,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
             color: Colors.grey[850],
             borderRadius: BorderRadius.circular(4),
             child: Container(
-              constraints: const BoxConstraints(maxHeight: 200),
+              constraints: const BoxConstraints(maxHeight: 230),
               child: ListView.builder(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
