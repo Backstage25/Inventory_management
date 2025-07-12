@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
-import '../screens/Dashboard.dart';
 
 class AddLoc extends StatefulWidget {
   const AddLoc({super.key});
@@ -37,7 +36,6 @@ class _AddLocState extends State<AddLoc> {
         ),
         content: Text(
           message,
-          textAlign: TextAlign.center,
           style: TextStyle(
             color: Colors.white,
             fontFamily: 'Inter',
@@ -181,10 +179,7 @@ class _AddLocState extends State<AddLoc> {
       appBar: SimpleAppBar(
         title: 'ADD LOCATION',
         onBack: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Dashboard()),
-          );
+          Navigator.pop(context);
         },
         onProfile: () {},
       ),

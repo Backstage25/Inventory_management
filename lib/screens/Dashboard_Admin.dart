@@ -24,10 +24,8 @@ class DashboardAdmin extends StatelessWidget {
       appBar: SimpleAppBar(
         title: 'ADMIN OPTIONS',
         onBack: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Dashboard()),
-          );
+          Navigator.pop(context);
+          Navigator.pop(context);
         },
         onProfile: () {},
       ),

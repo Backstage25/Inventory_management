@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:inventory_management_system/screens/Dashboard_Admin.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 
 class AddItemsPage extends StatefulWidget {
@@ -177,10 +176,7 @@ class _AddItemsPageState extends State<AddItemsPage> {
       appBar: SimpleAppBar(
         title: 'ADD ITEMS',
         onBack: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const DashboardAdmin()),
-          );
+          Navigator.pop(context);
         },
         onProfile: () {},
       ),

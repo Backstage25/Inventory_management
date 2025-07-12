@@ -40,12 +40,9 @@ class _PasswordScreenState extends State<PasswordScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF1E1E1E), // Dark background color
       appBar: SimpleAppBar(
-        title: 'ADMIN OPTIONS',
+        title: 'APPBAR',
         onBack: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Dashboard()),
-          );
+          Navigator.pop(context);
         },
         onProfile: () {},
       ),

@@ -187,16 +187,11 @@ class HistoryMake extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: SimpleAppBar(
-        title: 'HISTORY',
-        onBack: () => Navigator.pop(context),
-        onProfile: () {
-          final user = FirebaseAuth.instance.currentUser;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Logged in as: ${user?.displayName ?? "Unknown"}'),
-            ),
-          );
+        title: 'ACTION HISTORY',
+        onBack: () {
+          Navigator.pop(context);
         },
+        onProfile: () {},
       ),
       body: StreamBuilder<List<HistoryItem>>(
         stream: getHistoryStream(),

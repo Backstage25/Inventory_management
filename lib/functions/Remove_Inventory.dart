@@ -339,8 +339,10 @@ class _RemoveInventoryPageState extends State<RemoveInventoryPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF1E1E1E),
       appBar: SimpleAppBar(
-        title: 'REMOVE INVENTORY',
-        onBack: () => Navigator.pop(context),
+        title: 'REMOVE ITEMS',
+        onBack: () {
+          Navigator.pop(context);
+        },
         onProfile: () {},
       ),
       body: LayoutBuilder(

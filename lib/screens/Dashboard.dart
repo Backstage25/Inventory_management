@@ -213,7 +213,7 @@ class _DashboardState extends State<Dashboard> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const TransferInventory()),
+                      MaterialPageRoute(builder: (context) => const TransferInventoryPage()),
                     );
                   },
                 ),
@@ -229,7 +229,7 @@ class _DashboardState extends State<Dashboard> {
                 ),
                 DashboardButton(
                   iconPath: 'assets/icons/history.svg',
-                  label: "HISTORY",
+                  label: "ACTION HISTORY",
                   onPressed: () {
                     Navigator.push(
                       context,
