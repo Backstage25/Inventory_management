@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management_system/screens/Dashboard_Admin.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -132,10 +131,7 @@ class _RemoveLocState extends State<RemoveLoc> {
       appBar: SimpleAppBar(
         title: 'REMOVE LOCATION',
         onBack: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const DashboardAdmin()),
-          );
+          Navigator.pop(context);
         },
         onProfile: () {},
       ),

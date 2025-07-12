@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:inventory_management_system/screens/Dashboard.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 
 class ShowInventory extends StatefulWidget {
@@ -195,10 +194,7 @@ class _ShowInventoryState extends State<ShowInventory> {
       appBar: SimpleAppBar(
         title: 'SHOW INVENTORY',
         onBack: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Dashboard()),
-          );
+          Navigator.pop(context);
         },
         onProfile: () {},
       ),
