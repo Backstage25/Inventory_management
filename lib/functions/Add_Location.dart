@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 
@@ -80,6 +81,26 @@ class _AddLocState extends State<AddLoc> {
     );
   }
 
+  Future<void> _addToHistory(String locationName) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      // Get username from user's email or displayName
+      String username = user.displayName ?? user.email?.split('@')[0] ?? 'Unknown User';
+
+      await FirebaseFirestore.instance.collection('history').add({
+        'username': username,
+        'action': 'add_location',
+        'toLocation': locationName,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error adding to history: $e');
+      // Don't show error to user as this is secondary functionality
+    }
+  }
+
   Future<void> _showConfirmDialog() async {
     if (_controller.text.trim().isEmpty) {
       _showErrorDialog("Please enter a location name.");
@@ -156,6 +177,9 @@ class _AddLocState extends State<AddLoc> {
 
       // Create initial inventory document `0` with Quantity 0
       await locationDoc.collection('inventory').doc('0').set({'Quantity': 0});
+
+      // Add to history after successful location creation
+      await _addToHistory(locationName);
 
       setState(() {
         _isProcessing = false;
