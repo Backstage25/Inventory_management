@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RemoveLoc extends StatefulWidget {
   @override
@@ -99,7 +100,23 @@ class _RemoveLocState extends State<RemoveLoc> {
         .limit(1)
         .get();
     return query.docs.isNotEmpty;
+  }
 
+  Future<void> _addToHistory(String locationName) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('history').add({
+          'username': user.displayName ?? user.email ?? 'Unknown User',
+          'action': 'remove_location',
+          'toLocation': locationName,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      }
+    } catch (e) {
+      // History logging failed, but don't throw error since main operation succeeded
+      print('Failed to log history: $e');
+    }
   }
 
   Future<void> _removeLocation(String locationId, String locationName) async {
@@ -108,6 +125,10 @@ class _RemoveLocState extends State<RemoveLoc> {
     });
     try {
       await FirebaseFirestore.instance.collection('locations').doc(locationId).delete();
+
+      // Add to history after successful removal
+      await _addToHistory(locationName);
+
       setState(() {
         _selectedLocationId = null;
       });

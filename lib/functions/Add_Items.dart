@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 
 class AddItemsPage extends StatefulWidget {
@@ -16,10 +17,10 @@ class _AddItemsPageState extends State<AddItemsPage> {
   String? selectedLocation;
 
   final List<String> itemTypes = [
-    'Microphones',
-    'Cables',
-    'Speakers',
-    'Mixers',
+    'Microphone',
+    'Cable',
+    'Speaker',
+    'Sound Mixer',
     'Miscellaneous',
   ];
 
@@ -119,33 +120,82 @@ class _AddItemsPageState extends State<AddItemsPage> {
     );
   }
 
+  Future<void> _addToHistory() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      // Get username from user's email or displayName
+      String username = user.displayName ?? user.email?.split('@')[0] ?? 'Unknown User';
+
+      await FirebaseFirestore.instance.collection('history').add({
+        'username': username,
+        'action': 'add_item',
+        'toLocation': selectedLocation,
+        'timestamp': FieldValue.serverTimestamp(),
+        'items': [
+          {
+            'quantity': quantity,
+            'category': selectedItemType,
+            'name': itemNameController.text.trim(),
+          }
+        ],
+      });
+    } catch (e) {
+      print('Error adding to history: $e');
+      // Don't show error to user as this is secondary functionality
+    }
+  }
+
   Future<void> _addItemToFirestore() async {
     setState(() => _isProcessing = true);
-    final docId = '${itemNameController.text.trim()}_${selectedItemType!.trim()}';
-    final docRef = FirebaseFirestore.instance
-        .collection('locations')
-        .doc(selectedLocation)
-        .collection('inventory')
-        .doc(docId);
 
-    final docSnapshot = await docRef.get();
+    try {
+      final docId = '${itemNameController.text.trim()}_${selectedItemType!.trim()}';
+      final docRef = FirebaseFirestore.instance
+          .collection('locations')
+          .doc(selectedLocation)
+          .collection('inventory')
+          .doc(docId);
 
-    if (docSnapshot.exists) {
-      // Item already exists — update quantity
-      final currentQty = docSnapshot.data()?['Quantity'] ?? 0;
-      await docRef.update({
-        'Quantity': currentQty + quantity,
-      });
-    } else {
-      await docRef.set({
-        'Item Name': itemNameController.text,
-        'Type': selectedItemType,
-        'Quantity': quantity,
-      });
+      final docSnapshot = await docRef.get();
+
+      if (docSnapshot.exists) {
+        // Item already exists — update quantity
+        final currentQty = docSnapshot.data()?['Quantity'] ?? 0;
+        await docRef.update({
+          'Quantity': currentQty + quantity,
+        });
+      } else {
+        await docRef.set({
+          'Item Name': itemNameController.text.trim(),
+          'Type': selectedItemType,
+          'Quantity': quantity,
+        });
+      }
+
+      // Add to history after successful inventory update
+      await _addToHistory();
+
+      setState(() => _isProcessing = false);
+      _showSuccessDialog('Added Successfully!');
+
+      // Clear the form after successful addition
+      _clearForm();
+
+    } catch (e) {
+      setState(() => _isProcessing = false);
+      _showErrorDialog('Failed to add item: ${e.toString()}');
     }
+  }
 
-    setState(() => _isProcessing = false);
-    _showSuccessDialog('Added Successfully!');
+  void _clearForm() {
+    setState(() {
+      itemNameController.clear();
+      quantity = 1;
+      selectedItemType = null;
+      selectedLocation = null;
+    });
   }
 
   Future<void> _onAddPressed() async {

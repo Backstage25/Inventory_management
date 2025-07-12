@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 
 class RemoveInventoryPage extends StatefulWidget {
@@ -195,6 +196,45 @@ class _RemoveInventoryPageState extends State<RemoveInventoryPage> {
     });
   }
 
+  // Get current user's username or email
+  Future<String> _getCurrentUsername() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Try to get display name first, fallback to email
+      return user.displayName ?? user.email ?? 'Unknown User';
+    }
+    return 'Unknown User';
+  }
+
+  // Add history entry for item removal
+  Future<void> _addHistoryEntry(List<Map<String, dynamic>> removedItems) async {
+    try {
+      final username = await _getCurrentUsername();
+
+      // Prepare items data for history
+      final historyItems = removedItems.map((item) => {
+        'name': item['name'],
+        'quantity': item['removeQty'],
+        'category': item['category'],
+      }).toList();
+
+      // Add to history collection
+      await FirebaseFirestore.instance.collection('history').add({
+        'username': username,
+        'action': 'remove_item',
+        'fromLocation': 'Auditorium',
+        'toLocation': null,
+        'timestamp': FieldValue.serverTimestamp(),
+        'items': historyItems,
+      });
+
+      print('History entry added successfully');
+    } catch (e) {
+      print('Error adding history entry: $e');
+      // Don't throw error here as the main operation (removal) was successful
+    }
+  }
+
   Future<void> _confirmRemoval() async {
     final itemsToRemove = _filteredItems.where((item) => item['removeQty'] > 0).toList();
 
@@ -237,6 +277,9 @@ class _RemoveInventoryPageState extends State<RemoveInventoryPage> {
       }
 
       await batch.commit();
+
+      // Add history entry after successful removal
+      await _addHistoryEntry(itemsToRemove);
 
       _showSuccessDialog("Successfully removed ${itemsToRemove.length} item(s)!");
 
