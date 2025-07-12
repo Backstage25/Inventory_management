@@ -35,7 +35,7 @@ class ConfirmRemoveScreen extends StatelessWidget {
         },
         onProfile: () {},
       ),
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Color(0xFF1E1E1E),
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: scaleW(32),
@@ -167,7 +167,7 @@ class ConfirmRemoveScreen extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: scaleH(40)),
+            // SizedBox(height: scaleH(40)),
           ],
         ),
       ),
