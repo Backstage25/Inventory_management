@@ -47,20 +47,15 @@ class _RemoveInventoryPageState extends State<RemoveInventoryPage> {
           .collection('inventory')
           .get();
 
-      print('Found ${invSnapshot.docs.length} items in Auditorium');
-
       final Set<String> tempCategories = {};
       final items = <Map<String, dynamic>>[];
 
       for (final doc in invSnapshot.docs) {
         final data = doc.data();
-        print('Item data: $data');
 
         final category = data['Type'] ?? 'Uncategorized';
         final quantity = (data['Quantity'] ?? 0) as int;
         final itemName = data['Item Name'] ?? 'Unnamed';
-
-        print('Item: $itemName, Category: $category, Quantity: $quantity');
 
         if (quantity > 0) {
           tempCategories.add(category);
@@ -74,9 +69,6 @@ class _RemoveInventoryPageState extends State<RemoveInventoryPage> {
         }
       }
 
-      print('Categories found: $tempCategories');
-      print('Total items with quantity > 0: ${items.length}');
-
       setState(() {
         _allItems = items;
         allCategories = tempCategories;
@@ -84,7 +76,6 @@ class _RemoveInventoryPageState extends State<RemoveInventoryPage> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error loading inventory: $e');
       setState(() {
         _errorMessage = 'Error loading inventory: ${e.toString()}';
         _isLoading = false;
@@ -165,7 +156,7 @@ class _RemoveInventoryPageState extends State<RemoveInventoryPage> {
                     },
                   ),
                 );
-              }).toList(),
+              })
             ],
           ),
         );
@@ -227,11 +218,7 @@ class _RemoveInventoryPageState extends State<RemoveInventoryPage> {
         'timestamp': FieldValue.serverTimestamp(),
         'items': historyItems,
       });
-
-      print('History entry added successfully');
     } catch (e) {
-      print('Error adding history entry: $e');
-      // Don't throw error here as the main operation (removal) was successful
     }
   }
 

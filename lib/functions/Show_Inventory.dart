@@ -28,26 +28,20 @@ class _ShowInventoryState extends State<ShowInventory> {
       final locationsSnapshot =
       await FirebaseFirestore.instance.collection('locations').get();
 
-      print('Found ${locationsSnapshot.docs.length} locations');
-
       final Map<String, Map<String, Map<String, dynamic>>> tempData = {};
       final Set<String> tempCategories = {};
 
       for (final locDoc in locationsSnapshot.docs) {
-        print('Checking location: ${locDoc.id}');
         final invSnapshot = await FirebaseFirestore.instance
             .collection('locations')
             .doc(locDoc.id)
             .collection('inventory')
             .get();
 
-        print(' → ${invSnapshot.docs.length} items found');
-
         if (invSnapshot.docs.isNotEmpty) {
           tempData[locDoc.id] = {};
           for (final itemDoc in invSnapshot.docs) {
             final data = itemDoc.data();
-            print('    • Item data: $data');
 
             final itemName = data['Item Name'];
             final quantity = data['Quantity'] ?? 0;
@@ -69,11 +63,7 @@ class _ShowInventoryState extends State<ShowInventory> {
         allCategories = tempCategories;
         isLoading = false;
       });
-
-      print('Inventory loaded: $inventoryData');
-      print('Categories found: $allCategories');
     } catch (e) {
-      print('Error loading inventory: $e');
       setState(() => isLoading = false);
     }
   }
