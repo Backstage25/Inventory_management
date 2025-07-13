@@ -114,8 +114,6 @@ class _RemoveLocState extends State<RemoveLoc> {
         });
       }
     } catch (e) {
-      // History logging failed, but don't throw error since main operation succeeded
-      print('Failed to log history: $e');
     }
   }
 

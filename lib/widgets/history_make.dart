@@ -92,7 +92,7 @@ class _HistoryMakeState extends State<HistoryMake> {
       case 'remove_item':
         return Colors.redAccent.shade200;
       case 'transfer':
-        return Colors.orangeAccent.shade200;
+        return Colors.blueAccent.shade400;
       default:
         return Colors.blueGrey.shade200;
     }

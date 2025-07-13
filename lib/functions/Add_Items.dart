@@ -142,7 +142,6 @@ class _AddItemsPageState extends State<AddItemsPage> {
         ],
       });
     } catch (e) {
-      print('Error adding to history: $e');
       // Don't show error to user as this is secondary functionality
     }
   }
@@ -516,7 +515,6 @@ class __CustomDropdownState extends State<_CustomDropdown> {
               itemCount: widget.items.length,
               itemBuilder: (context, index) {
                 final item = widget.items[index];
-                final isSelected = item == widget.value;
                 return ListTile(
                   title: Text(
                     item,

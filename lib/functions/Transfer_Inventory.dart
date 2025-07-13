@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TransferInventoryPage extends StatefulWidget {
   const TransferInventoryPage({super.key});
@@ -239,6 +240,24 @@ class _TransferInventoryPageState extends State<TransferInventoryPage> {
       }
 
       await batch.commit();
+
+      final currentUser = FirebaseAuth.instance.currentUser?.displayName; // Replace with actual user
+      final historyEntry = {
+        'username': currentUser,
+        'action': 'transfer',
+        'fromLocation': fromLocation,
+        'toLocation': toLocation,
+        'timestamp': FieldValue.serverTimestamp(),
+        'items': cart.entries.map((entry) {
+          final itemId = entry.key;
+          final qty = entry.value;
+          final itemName = cartDetails[itemId]?['Item Name'] ?? 'Unknown';
+          return {'name': itemName, 'quantity': qty};
+        }).toList(),
+      };
+
+      await FirebaseFirestore.instance.collection('history').add(historyEntry);
+
       setState(() {
         _isProcessing = false;
       });
