@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management_system/screens/Dashboard.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:inventory_management_system/screens/Dashboard_Admin.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 
@@ -12,12 +12,71 @@ class PasswordScreen extends StatefulWidget {
 
 class _PasswordScreenState extends State<PasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Set admin PIN here (can be later fetched from a secure source)
-  final String _adminPin = "000000";
+  bool _isLoading = false;
+  String? _adminPin;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAdminPin();
+  }
+
+  // Fetch admin PIN from Firebase
+  Future<void> _fetchAdminPin() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Fetch from Firestore (adjust collection/document path as needed)
+      DocumentSnapshot doc = await _firestore
+          .collection('settings')
+          .doc('admin_config')
+          .get();
+
+      if (doc.exists) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        _adminPin = data['admin_pin']?.toString();
+      }
+
+      // Alternative: You can also store it in Firebase Remote Config
+      // or Firebase Realtime Database based on your preference
+
+    } catch (e) {
+      // Fallback to a default PIN or show error
+      _adminPin = "000000"; // Fallback PIN
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error loading configuration. Using default settings.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   // Function to check the password and navigate
-  void _validatePassword() {
+  Future<void> _validatePassword() async {
+    if (_adminPin == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Configuration not loaded. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     if (_passwordController.text == _adminPin) {
       Navigator.push(
         context,
@@ -25,7 +84,10 @@ class _PasswordScreenState extends State<PasswordScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Incorrect password')),
+        const SnackBar(
+          content: Text('Incorrect password'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -47,7 +109,13 @@ class _PasswordScreenState extends State<PasswordScreen> {
         onProfile: () {},
       ),
       // Main content
-      body: Column(
+      body: _isLoading
+          ? const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      )
+          : Column(
         children: [
           SizedBox(height: screenHeight * 0.35), // Spacer
 
@@ -60,13 +128,17 @@ class _PasswordScreenState extends State<PasswordScreen> {
               keyboardType: TextInputType.number,
               maxLength: 6,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontFamily : 'Inter'),
+              style: const TextStyle(color: Colors.white, fontFamily: 'Inter'),
               decoration: InputDecoration(
                 counterText: "",
                 hintText: 'Enter Password',
-                hintStyle: TextStyle(color: Colors.grey, fontFamily: 'Roboto', fontSize : screenWidth * 0.05),
+                hintStyle: TextStyle(
+                  color: Colors.grey,
+                  fontFamily: 'Roboto',
+                  fontSize: screenWidth * 0.05,
+                ),
                 filled: true,
-                fillColor: Color(0xFF2E2E2E),
+                fillColor: const Color(0xFF2E2E2E),
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 14),
                 border: OutlineInputBorder(
@@ -101,8 +173,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                           color: Colors.white,
                           fontFamily: 'Inter',
                           fontSize: 20 * fontScale,
-                          fontWeight: FontWeight.bold
-                      ),
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -121,14 +192,13 @@ class _PasswordScreenState extends State<PasswordScreen> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
-                    onPressed: _validatePassword,
+                    onPressed: _adminPin != null ? _validatePassword : null,
                     child: Text(
                       'CONFIRM',
                       style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 20 * fontScale,
-                          fontWeight: FontWeight.bold
-                      ),
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -138,5 +208,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
   }
 }

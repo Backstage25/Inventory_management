@@ -42,7 +42,6 @@ class _StartUpState extends State<StartUp> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: const Color(0xFF1E1E1E),
       body: SafeArea(

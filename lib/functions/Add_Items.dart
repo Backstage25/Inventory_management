@@ -150,7 +150,12 @@ class _AddItemsPageState extends State<AddItemsPage> {
     setState(() => _isProcessing = true);
 
     try {
-      final docId = '${itemNameController.text.trim()}_${selectedItemType!.trim()}';
+      final rawItemName = itemNameController.text.trim();
+      final rawItemType = selectedItemType!.trim();
+      final normalizedItemName = rawItemName.toLowerCase();
+      final normalizedItemType = rawItemType.toLowerCase();
+      final docId = '${normalizedItemName}_${normalizedItemType}';
+
       final docRef = FirebaseFirestore.instance
           .collection('locations')
           .doc(selectedLocation)
@@ -167,8 +172,8 @@ class _AddItemsPageState extends State<AddItemsPage> {
         });
       } else {
         await docRef.set({
-          'Item Name': itemNameController.text.trim(),
-          'Type': selectedItemType,
+          'Item Name': rawItemName,   // keep original casing for display
+          'Type': rawItemType,        // keep original casing
           'Quantity': quantity,
         });
       }
@@ -187,6 +192,7 @@ class _AddItemsPageState extends State<AddItemsPage> {
       _showErrorDialog('Failed to add item: ${e.toString()}');
     }
   }
+
 
   void _clearForm() {
     setState(() {
