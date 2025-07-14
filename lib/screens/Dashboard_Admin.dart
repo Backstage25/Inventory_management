@@ -70,7 +70,7 @@ class DashboardAdmin extends StatelessWidget {
                     }
                 ),
                 DashboardButton(
-                    iconPath: 'assets/icons/invite_user.svg', // You'll need to add this icon
+                    iconPath: 'assets/icons/invite.svg', // You'll need to add this icon
                     label: "INVITE USER",
                     onPressed: () {
                       _showInviteDialog(context);
