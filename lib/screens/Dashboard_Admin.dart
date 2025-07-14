@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inventory_management_system/functions/Remove_Inventory.dart';
-import 'package:inventory_management_system/screens/Dashboard.dart';
 import 'package:inventory_management_system/widgets/Dashboard_Button.dart';
 import 'package:inventory_management_system/functions/Add_Items.dart';
 import 'package:inventory_management_system/functions/Remove_Location.dart';
@@ -9,6 +8,8 @@ import 'package:inventory_management_system/widgets/AppBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 class DashboardAdmin extends StatelessWidget {
   const DashboardAdmin({Key? key}) : super(key: key);
@@ -69,7 +70,7 @@ class DashboardAdmin extends StatelessWidget {
                     }
                 ),
                 DashboardButton(
-                    iconPath: 'assets/icons/invite_user.svg', // You'll need to add this icon
+                    iconPath: 'assets/icons/invite.svg', // You'll need to add this icon
                     label: "INVITE USER",
                     onPressed: () {
                       _showInviteDialog(context);
@@ -104,6 +105,27 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
   bool _isLoading = false;
   String? _generatedCode;
   bool _isSuccess = false;
+
+  Future<void> _sendEmail(String inviteCode, String recipientEmail) async {
+    String username = 'backstage25.app@gmail.com'; // Your Gmail address
+    String password = 'qgnbpyshegzaznmi'; // Your Gmail password or App Password
+
+    final smtpServer = gmail(username, password);
+
+    // Create the email message
+    final message = Message()
+      ..from = Address(username)
+      ..recipients.add(recipientEmail)
+      ..subject = 'Your Invite Code'
+      ..text = 'Your invite code is: $inviteCode';
+
+    try {
+      await send(message, smtpServer);
+      print('Email sent successfully!');
+    } catch (e) {
+      print('Failed to send email: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -392,7 +414,7 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
 
       // Generate unique invite code
       String inviteCode = _generateInviteCode();
-      print('Generated invite code: $inviteCode');
+
 
       // Create invitation document
       Map<String, dynamic> inviteData = {
@@ -407,14 +429,13 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
         'used_at': null,
       };
 
-      print('Invite data: $inviteData');
 
       DocumentReference docRef = await FirebaseFirestore.instance
           .collection('pending_invitations')
           .add(inviteData);
 
-      print('Invitation created with ID: ${docRef.id}');
-
+      // After creating the invitation document
+      await _sendEmail(inviteCode, email);
       setState(() {
         _generatedCode = inviteCode;
         _isSuccess = true;
