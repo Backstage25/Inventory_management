@@ -10,6 +10,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:math';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:csv/csv.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 class DashboardAdmin extends StatelessWidget {
   const DashboardAdmin({Key? key}) : super(key: key);
@@ -70,6 +75,13 @@ class DashboardAdmin extends StatelessWidget {
                     }
                 ),
                 DashboardButton(
+                  iconPath: 'assets/icons/invite.svg', // Use a suitable icon
+                  label: "EXPORT",
+                  onPressed: () {
+                    _exportInventoryToCSV(context);
+                  },
+                ),
+                DashboardButton(
                     iconPath: 'assets/icons/invite.svg', // You'll need to add this icon
                     label: "INVITE USER",
                     onPressed: () {
@@ -81,6 +93,93 @@ class DashboardAdmin extends StatelessWidget {
           )
       ),
     );
+  }
+
+  Future<void> _exportInventoryToCSV(BuildContext context) async {
+    try {
+      // Request storage permission
+      // if (Platform.isAndroid) {
+      // if (!(await Permission.storage.request().isGranted)) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(
+      //       content: Text('Permission required to save in Downloads folder.'),
+      //       backgroundColor: Colors.red,
+      //     ),
+      //   );
+      //   return;
+      // }}
+
+      // Fetch all locations
+      final locationsSnapshot =
+      await FirebaseFirestore.instance.collection('locations').get();
+
+      List<List<dynamic>> csvData = [
+        ['Location', 'Item Name', 'Quantity']
+      ];
+      Map<String, int> allItemsTotal = {}; // itemName -> totalQty
+      for (final locDoc in locationsSnapshot.docs){
+        final invSnapshot = await FirebaseFirestore.instance
+            .collection('locations')
+            .doc(locDoc.id)
+            .collection('inventory')
+            .get();
+
+        bool firstItem = true;
+        for (final itemDoc in invSnapshot.docs) {
+          final data = itemDoc.data();
+          final itemName = data['Item Name'];
+          // Firestore can return num, so force int
+          int qty = (data['Quantity'] ?? 0) is int
+              ? (data['Quantity'] ?? 0)
+              : ((data['Quantity'] ?? 0) as num).toInt();
+          if (itemName != null) {
+            if (firstItem) {
+              csvData.add([locDoc.id, itemName, qty.toString(), '']);
+              firstItem = false;
+            } else {
+              csvData.add(['', itemName, qty.toString(), '']);
+            }
+            allItemsTotal[itemName] = (allItemsTotal[itemName] ?? 0) + qty;
+          }
+        }
+      }
+
+      csvData.add(['ALL', '', '']);
+      allItemsTotal.forEach((item, qty) {
+        csvData.add(['', item, qty.toString()]);
+      });
+
+
+      // Convert to CSV
+      String csv = const ListToCsvConverter().convert(csvData);
+
+      // Get the Downloads directory
+      final downloadsPath = '/storage/emulated/0/Download'; // Public Downloads on most Android devices
+      if (downloadsPath == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Downloads directory not available'),
+            backgroundColor: Colors.red));
+        return;
+      }
+      final path = "${downloadsPath}/inventory_export.csv";
+      print('Export path: $path');
+      final file = File(path);
+      await file.writeAsString(csv);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Inventory exported to Downloads:\n$path'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Export failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _showInviteDialog(BuildContext context) {
