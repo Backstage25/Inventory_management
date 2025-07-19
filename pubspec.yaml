@@ -43,6 +43,10 @@ dependencies:
   google_sign_in: ^6.3.0
   cloud_functions: 5.5.2
   mailer: ^6.0.0
+  csv: ^6.0.0
+  permission_handler: ^12.0.1
+  path_provider: ^2.1.5
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -57,7 +61,10 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"  # <-- Path to your new icon
 # The following section is specific to Flutter packages.
 flutter:
   assets:
