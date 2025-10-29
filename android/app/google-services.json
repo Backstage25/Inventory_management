@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "54035457595-drudqk28p39jtqv4s8jl6n92mhr4edgu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.inventory_management_system",
+            "certificate_hash": "a271e210196d6d1aede6c38afca1c20e51aa2c3b"
+          }
+        },
+        {
           "client_id": "54035457595-limgghbkjf920647race4hj22k3km063.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

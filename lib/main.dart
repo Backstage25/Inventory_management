@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:inventory_management_system/firebase_options.dart';
 import 'package:inventory_management_system/screens/Startup.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
-WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
-await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-await SystemChrome.setPreferredOrientations([
-DeviceOrientation.portraitUp,
-]);
+  await SystemChrome.setPreferredOrientations([
+  DeviceOrientation.portraitUp,
+  ]);
 
-runApp(const MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
