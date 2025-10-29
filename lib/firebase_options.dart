@@ -59,12 +59,13 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAJmJePPEHuVPzzYTC6i48MosDF3dqh0zE',
-    appId: '1:54035457595:ios:957adc049d7578ba6a5e1e',
+    appId: '1:54035457595:ios:7501a2ef83bee3056a5e1e',
     messagingSenderId: '54035457595',
     projectId: 'backstage-inventory',
     storageBucket: 'backstage-inventory.firebasestorage.app',
     androidClientId: '54035457595-drudqk28p39jtqv4s8jl6n92mhr4edgu.apps.googleusercontent.com',
-    iosClientId: '54035457595-06csdo023v5bqb19miqg1pccriao8lhq.apps.googleusercontent.com',
-    iosBundleId: 'com.example.inventoryManagementSystem',
+    iosClientId: '54035457595-2ukdqo6gjujogu7s3ssilpt7j0b6j0hr.apps.googleusercontent.com',
+    iosBundleId: 'com.backstage.backlog',
   );
+
 }
