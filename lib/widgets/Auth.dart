@@ -135,34 +135,49 @@ class _AuthState extends State<Auth> {
 
   // Check if user needs to enter invite code or has been deactivated
   Future<bool> _needsInviteCode(String email) async {
-    try {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('registered_users')
-          .doc(email)
-          .get();
+  try {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('registered_users')
+        .doc(email)
+        .get();
 
-      if (!userDoc.exists) return true;
+    // New user — doc doesn't exist at all
+    if (!userDoc.exists) return true;
 
-      if (!RegistrationService.isRegistered(userDoc)) {
-        await RegistrationService.forceLogout();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Your account has been deactivated.'),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
-        return true;
+    // User exists but was deactivated
+    if (!RegistrationService.isRegistered(userDoc)) {
+      await RegistrationService.forceLogout();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Your account has been deactivated.'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
-
-      return false;
-    } catch (e) {
-      print('Error checking invite code requirement: $e');
       return true;
     }
+
+    // All good — registered and active
+    return false;
+
+  } catch (e) {
+    debugPrint('Error checking registration: $e');
+    // ← Don't return true here! Sign out and show a proper error instead.
+    await RegistrationService.forceLogout();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to verify registration. Please try again.'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+    return true;
   }
+}
 
   // Show invite code dialog
   void _showInviteCodeDialog(BuildContext context, String email) {

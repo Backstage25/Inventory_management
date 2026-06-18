@@ -39,22 +39,23 @@ class RegistrationService {
   }
 
   static Future<void> removeRegisteredUser({
-    required String email,
-    required String removedBy,
-    String? displayEmail,
-  }) async {
-    await FirebaseFirestore.instance
-        .collection('registered_users')
-        .doc(email)
-        .delete();
+  required String email,
+  required String removedBy,
+  String? displayEmail,
+}) async {
+  // Soft delete: set is_active = false instead of deleting the document
+  await FirebaseFirestore.instance
+      .collection('registered_users')
+      .doc(email)
+      .update({'is_active': false});
 
-    await FirebaseFirestore.instance.collection('history').add({
-      'username': removedBy,
-      'action': 'remove_user',
-      'removed_user': displayEmail ?? email,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
-  }
+  await FirebaseFirestore.instance.collection('history').add({
+    'username': removedBy,
+    'action': 'remove_user',
+    'removed_user': displayEmail ?? email,
+    'timestamp': FieldValue.serverTimestamp(),
+  });
+}
 
   static Future<void> handleRevokedAccess(GlobalKey<NavigatorState> navigatorKey) async {
     revocationMessage = 'Your access has been revoked. Please contact an administrator.';
