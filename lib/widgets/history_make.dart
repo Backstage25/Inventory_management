@@ -7,7 +7,6 @@ class HistoryItem {
   final String action;
   final String? fromLocation;
   final String? toLocation;
-  final String? removedUser;
   final DateTime timestamp;
   final List<Map<String, dynamic>>? items;
 
@@ -16,7 +15,6 @@ class HistoryItem {
     required this.action,
     this.fromLocation,
     this.toLocation,
-    this.removedUser,
     required this.timestamp,
     this.items,
   });
@@ -27,7 +25,6 @@ class HistoryItem {
       action: data['action'] ?? 'unknown_action',
       fromLocation: data['fromLocation'],
       toLocation: data['toLocation'],
-      removedUser: data['removed_user'],
       timestamp: (data['timestamp'] as Timestamp).toDate(),
       items: data['items'] != null
           ? List<Map<String, dynamic>>.from(
@@ -49,8 +46,6 @@ class HistoryItem {
         return '$username removed items';
       case 'transfer':
         return '$username transferred items from $fromLocation to $toLocation';
-      case 'remove_user':
-        return '$username removed access for ${removedUser ?? 'a user'}';
       default:
         return '$username performed $action';
     }
@@ -95,7 +90,6 @@ class _HistoryMakeState extends State<HistoryMake> {
         return Colors.greenAccent.shade400;
       case 'remove_location':
       case 'remove_item':
-      case 'remove_user':
         return Colors.redAccent.shade200;
       case 'transfer':
         return Colors.blueAccent.shade400;
@@ -114,8 +108,6 @@ class _HistoryMakeState extends State<HistoryMake> {
         return Icons.add_box;
       case 'remove_item':
         return Icons.indeterminate_check_box;
-      case 'remove_user':
-        return Icons.person_remove;
       case 'transfer':
         return Icons.compare_arrows;
       default:

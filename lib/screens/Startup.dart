@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:inventory_management_system/widgets/Auth.dart';
 import 'package:inventory_management_system/screens/Dashboard.dart';
-import 'package:inventory_management_system/services/registration_service.dart';
 
 class StartUp extends StatefulWidget {
   const StartUp({super.key});
@@ -18,37 +17,26 @@ class _StartUpState extends State<StartUp> {
     _checkAuthState();
   }
 
-  Future<void> _checkAuthState() async {
-    await Future.delayed(const Duration(seconds: 1));
+  void _checkAuthState() {
+    // Add a delay to show the splash screen
+    Future.delayed(const Duration(seconds:1), () {
+      // Check if user is already signed in
+      User? user = FirebaseAuth.instance.currentUser;
 
-    if (!mounted) return;
-
-    final User? user = FirebaseAuth.instance.currentUser;
-
-    if (user?.email == null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Auth()),
-      );
-      return;
-    }
-
-    final isRegistered = await RegistrationService.checkRegistration(user!.email!);
-
-    if (!mounted) return;
-
-    if (isRegistered) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Dashboard()),
-      );
-    } else {
-      await RegistrationService.forceLogout();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Auth()),
-      );
-    }
+      if (user != null) {
+        // User is logged in, navigate to Dashboard
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Dashboard()),
+        );
+      } else {
+        // User is not logged in, navigate to Auth
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Auth()),
+        );
+      }
+    });
   }
 
   @override

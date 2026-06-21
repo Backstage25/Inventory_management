@@ -4,8 +4,6 @@ import 'package:inventory_management_system/functions/Remove_Inventory.dart';
 import 'package:inventory_management_system/widgets/Dashboard_Button.dart';
 import 'package:inventory_management_system/functions/Add_Items.dart';
 import 'package:inventory_management_system/functions/Remove_Location.dart';
-import 'package:inventory_management_system/functions/Remove_User.dart';
-import 'package:inventory_management_system/services/registration_service.dart';
 import 'package:inventory_management_system/widgets/AppBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -84,20 +82,10 @@ class DashboardAdmin extends StatelessWidget {
                   },
                 ),
                 DashboardButton(
-                    iconPath: 'assets/icons/invite.svg',
+                    iconPath: 'assets/icons/invite.svg', // You'll need to add this icon
                     label: "INVITE USER",
                     onPressed: () {
                       _showInviteDialog(context);
-                    }
-                ),
-                DashboardButton(
-                    iconPath: 'assets/icons/remove_items.svg',
-                    label: "REMOVE USER",
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const RemoveUserPage()),
-                      );
                     }
                 )
               ],
@@ -488,7 +476,7 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
 
         print('User doc exists: ${userDoc.exists}');
 
-        if (RegistrationService.isRegistered(userDoc)) {
+        if (userDoc.exists) {
           _showSnackBar('User is already registered', Colors.orange);
           setState(() {
             _isLoading = false;
@@ -505,6 +493,7 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
         QuerySnapshot pendingInvites = await FirebaseFirestore.instance
             .collection('pending_invitations')
             .where('email', isEqualTo: email)
+            .where('used', isEqualTo: false)
             .where('expires_at', isGreaterThan: Timestamp.now())
             .get();
 
@@ -535,6 +524,8 @@ class _InviteUserDialogState extends State<InviteUserDialog> {
         'expires_at': Timestamp.fromDate(
           DateTime.now().add(const Duration(days: 7)),
         ),
+        'used': false,
+        'used_at': null,
       };
 
 
