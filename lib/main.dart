@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inventory_management_system/screens/Startup.dart';
-import 'package:inventory_management_system/services/registration_service.dart';
 import 'package:firebase_core/firebase_core.dart';
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
 WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +21,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF1E1E1E),
@@ -58,10 +54,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Color(0xFF2E2E2E),
         ),
       ),
-      home: RegistrationGuard(
-        navigatorKey: navigatorKey,
-        child: const StartUp(),
-      ),
+      home: const StartUp(),
     );
   }
 }
