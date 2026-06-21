@@ -162,26 +162,21 @@ class _AuthState extends State<Auth> {
     // All good — registered and active
     return false;
 
-  } catch (e, stackTrace) {
-  if (mounted) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Debug Error'),
-        content: SingleChildScrollView(
-          child: Text('$e\n\n$stackTrace'),
+  } catch (e) {
+    debugPrint('Error checking registration: $e');
+    // ← Don't return true here! Sign out and show a proper error instead.
+    await RegistrationService.forceLogout();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to verify registration. Please try again.'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+      );
+    }
+    return true;
   }
-  return true;
-}
 }
 
   // Show invite code dialog
